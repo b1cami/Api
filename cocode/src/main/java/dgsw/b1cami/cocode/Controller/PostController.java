@@ -3,6 +3,7 @@ package dgsw.b1cami.cocode.Controller;
 import dgsw.b1cami.cocode.Domain.Post;
 import dgsw.b1cami.cocode.Service.PostService;
 import dgsw.b1cami.cocode.json.PostResponse;
+import dgsw.b1cami.cocode.json.PostsResponse;
 import dgsw.b1cami.cocode.json.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,12 @@ public class PostController {
     public ResponseEntity<Response> uploadPost(@RequestBody Post post) {
         System.out.println("post uploadPost - " + post.getTitle());
         return new ResponseEntity<>(postService.uploadPost(post), HttpStatus.OK);
+    }
+
+    @GetMapping("/getPosts/{getCount}")
+    public ResponseEntity<PostsResponse> getPosts(@PathVariable Integer getCount) {
+        System.out.println("post getPosts - " + getCount);
+        return new ResponseEntity<>(postService.getPosts(getCount), HttpStatus.OK);
     }
 
 }

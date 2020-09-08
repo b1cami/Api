@@ -1,14 +1,17 @@
 package dgsw.b1cami.cocode.Service;
 
 import dgsw.b1cami.cocode.Domain.Post;
-import dgsw.b1cami.cocode.Domain.User;
+import dgsw.b1cami.cocode.Domain.PostOutput;
 import dgsw.b1cami.cocode.Exception.UserException;
 import dgsw.b1cami.cocode.Repository.PostRepository;
 import dgsw.b1cami.cocode.Repository.UserRepository;
 import dgsw.b1cami.cocode.json.PostResponse;
+import dgsw.b1cami.cocode.json.PostsResponse;
 import dgsw.b1cami.cocode.json.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -65,6 +68,35 @@ public class PostServiceImpl implements PostService {
         } catch(Exception e) {
             e.printStackTrace();
             return new PostResponse(500, e.getMessage());
+        }
+    }
+
+    @Override
+    public PostsResponse getPosts(Integer getCount) {
+        try {
+            if(getCount < 0)
+                throw new UserException(400, "GetCount Must Ge Bigger Than 0");
+
+            Integer postCount = (int) postRepository.count();
+
+            getCount = postCount - (getCount * 20);
+            if(getCount <= 0)
+                throw new UserException(400, "All Posts Already Returned");
+
+            ArrayList<Post> posts = postRepository.findPosts(getCount);
+            ArrayList<PostOutput> postOutputs = new ArrayList<>();
+
+            for(Post post : posts) {
+                post.setContent(null);
+                postOutputs.add(new PostOutput(post));
+            }
+
+            return new PostsResponse(200, "Success getPosts", postOutputs);
+        } catch(UserException e) {
+            return new PostsResponse(e.getStatus(), e.getMessage());
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new PostsResponse(500, e.getMessage());
         }
     }
 
