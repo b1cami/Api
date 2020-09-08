@@ -2,7 +2,7 @@ package dgsw.b1cami.cocode.Domain;
 
 public class UserOutput {
 
-    Long id;
+    Integer id;
 
     String email;
 
@@ -26,11 +26,11 @@ public class UserOutput {
         this.setCertifyCode(user.getCertifyCode());
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

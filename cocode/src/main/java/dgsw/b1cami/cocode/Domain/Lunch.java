@@ -12,7 +12,7 @@ public class Lunch {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer lunchId;
+    Long lunchId;
 
     @Column(nullable = false)
     String lunchUploader;
@@ -23,11 +23,11 @@ public class Lunch {
     @Column(nullable = true, length = 100)
     String lunchDescription;
 
-    public Integer getId() {
+    public Long getId() {
         return lunchId;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.lunchId = id;
     }
 

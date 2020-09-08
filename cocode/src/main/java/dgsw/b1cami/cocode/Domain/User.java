@@ -12,7 +12,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long userId;
+    Integer userId;
 
     @Column(nullable = false, unique = true, length = 320)
     String userEmail;
@@ -36,11 +36,11 @@ public class User {
         this.setEmail(email);
     }
 
-    public Long getId() {
+    public Integer getId() {
         return userId;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.userId = id;
     }
 

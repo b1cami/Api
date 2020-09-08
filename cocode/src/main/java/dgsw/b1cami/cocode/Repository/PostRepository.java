@@ -12,13 +12,13 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Repository
-public interface PostRepository extends JpaRepository<Post, Integer> {
+public interface PostRepository extends JpaRepository<Post, Long> {
 
-    Optional<Post> findByPostId(Integer postId);
+    Optional<Post> findByPostId(Long postId);
 
     @Transactional
     @Modifying
     @Query(value = "SELECT * FROM post WHERE post_id >= (:postCount - 20) AND post_id < :postCount ORDER BY post_id DESC", nativeQuery = true)
-    ArrayList<Post> findPosts(@Param("postCount") Integer postCount);
+    ArrayList<Post> findPosts(@Param("postCount") Long postCount);
 
 }

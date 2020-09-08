@@ -18,7 +18,7 @@ public class Token {
     Integer tokenId;
 
     @Column(nullable = false, unique = true)
-    Long tokenOwnerId;
+    Integer tokenOwnerId;
 
     @Column(nullable = false)
     String tokenKey;
@@ -34,7 +34,7 @@ public class Token {
     @UpdateTimestamp
     LocalDateTime tokenUpdated;
 
-    public Token(Long ownerId, String key, String ip) {
+    public Token(Integer ownerId, String key, String ip) {
         this.setOwnerId(ownerId);
         this.setKey(key);
         this.setIp(ip);
@@ -48,11 +48,11 @@ public class Token {
         this.tokenId = id;
     }
 
-    public Long getOwnerId() {
+    public Integer getOwnerId() {
         return tokenOwnerId;
     }
 
-    public void setOwnerId(Long ownerId) {
+    public void setOwnerId(Integer ownerId) {
         this.tokenOwnerId = ownerId;
     }
 

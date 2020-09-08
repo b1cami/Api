@@ -12,7 +12,7 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer postId;
+    Long postId;
 
     @Column(nullable = false)
     String postUploader;
@@ -23,11 +23,11 @@ public class Post {
     @Column(nullable = false, length = 10000)
     String postContent;
 
-    public Integer getId() {
+    public Long getId() {
         return postId;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.postId = id;
     }
 

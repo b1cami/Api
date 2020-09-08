@@ -11,9 +11,9 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
-    Optional<User> findByUserId(Long userId);
+    Optional<User> findByUserId(Integer userId);
 
     Optional<User> findByUserEmail(String userEmail);
 
@@ -24,6 +24,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Modifying
     @Query(value = "UPDATE user SET user_certify_code = null where user_id = :userId", nativeQuery = true)
-    void certifyUser(@Param("userId") Long userId);
+    void certifyUser(@Param("userId") Integer userId);
 
 }

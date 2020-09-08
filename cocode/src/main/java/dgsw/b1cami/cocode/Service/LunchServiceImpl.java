@@ -2,6 +2,7 @@ package dgsw.b1cami.cocode.Service;
 
 import dgsw.b1cami.cocode.Domain.*;
 import dgsw.b1cami.cocode.Exception.UserException;
+import dgsw.b1cami.cocode.Repository.LunchCommentRepository;
 import dgsw.b1cami.cocode.Repository.LunchRepository;
 import dgsw.b1cami.cocode.Repository.TokenRepository;
 import dgsw.b1cami.cocode.Repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 @Service
 public class LunchServiceImpl implements LunchService {
@@ -27,6 +29,9 @@ public class LunchServiceImpl implements LunchService {
     @Autowired
     LunchRepository lunchRepository;
 
+    @Autowired
+    LunchCommentRepository lunchCommentRepository;
+
     @Override
     public Response uploadLunch(Lunch lunch, String key) {
         try {
@@ -37,8 +42,8 @@ public class LunchServiceImpl implements LunchService {
                     () -> new UserException(400, "Undefined Token Key")
             );
 
-            User user = userRepository.findByUserId(token.getOwnerId()).orElse(
-                    new User("If This Goes Out, It'll Be Fucking Serious Error")
+            User user = userRepository.findByUserId(token.getOwnerId()).orElseThrow(
+                    () -> new UserException(400, "Unreachable Code - Just For Deleting Yellow Line")
             );
 
             String uploader = user.getName();
@@ -73,7 +78,7 @@ public class LunchServiceImpl implements LunchService {
     }
 
     @Override
-    public LunchResponse getLunch(Integer lunchId) {
+    public LunchResponse getLunch(Long lunchId) {
         try {
             Lunch lunch = lunchRepository.findByLunchId(lunchId).orElseThrow(
                     () -> new UserException(400, "Undefined Lunch")
@@ -89,13 +94,13 @@ public class LunchServiceImpl implements LunchService {
     }
 
     @Override
-    public LunchesResponse getLunches(Integer getCount) {
+    public LunchesResponse getLunches(Long getCount) {
         try {
             if(getCount < 0)
                 throw new UserException(400, "GetCount Must Ge Bigger Than 0");
 
-            int minCount = lunchRepository.findAll().get(0).getId();
-            int postCount = (int) lunchRepository.count() + minCount;
+            Long minCount = lunchRepository.findAll().get(0).getId();
+            long postCount = lunchRepository.count() + minCount;
 
             getCount = postCount - (getCount * 20);
             if(getCount <= minCount)
@@ -121,6 +126,7 @@ public class LunchServiceImpl implements LunchService {
         try {
             Calendar calendar = Calendar.getInstance();
 
+            //Yellow Line..... Why Not StringBuilder?
             StringBuilder url = new StringBuilder(
                     "https://stu.dge.go.kr/sts_sci_md00_001.do?schulCode=D100000282&schulCrseScCode=4&schulKndScCode=04&schYm="
             );
@@ -167,7 +173,7 @@ public class LunchServiceImpl implements LunchService {
     }
 
     @Override
-    public Response deleteLunch(Integer lunchId) {
+    public Response deleteLunch(Long lunchId) {
         try {
             Lunch lunch = lunchRepository.findByLunchId(lunchId).orElseThrow(
                     () -> new UserException(400, "Undefined LunchId")
@@ -180,6 +186,80 @@ public class LunchServiceImpl implements LunchService {
         } catch(Exception e) {
             e.printStackTrace();
             return new Response(500, e.getMessage());
+        }
+    }
+
+    @Override
+    public Response addComment(LunchComment lunchComment, String key) {
+        try {
+            if(key == null)
+                throw new UserException(400, "Requires Key");
+
+            Token token = tokenRepository.findByTokenKey(key).orElseThrow(
+                    () -> new UserException(400, "Undefined Token Key")
+            );
+
+            User user = userRepository.findByUserId(token.getOwnerId()).orElseThrow(
+                    () -> new UserException(400, "Unreachable Code - Just For Deleting Yellow Line")
+            );
+
+            String comment = lunchComment.getComment();
+            Long lunchId = lunchComment.getLunchId();
+
+            if(comment == null)
+                throw new UserException(400, "Requires Comment");
+            if(lunchId == null)
+                throw new UserException(400, "Requires LunchId");
+
+            lunchRepository.findByLunchId(lunchId).orElseThrow(
+                    () -> new UserException(400, "Undefined LunchId")
+            );
+
+            if(comment.length() > 255)
+                throw new UserException(400, "Comment Must Be Shorter Than 255");
+
+            lunchComment.setUserId(user.getId());
+            lunchCommentRepository.save(lunchComment);
+            return new Response(200, "Success addComment");
+        } catch (UserException e) {
+            return new Response(e.getStatus(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Response(500, e.getMessage());
+        }
+    }
+
+    @Override
+    public CommentResponse getComments(Lunch lunch) {
+        try {
+            Long lunchId = lunch.getId();
+
+            if (lunchId == null)
+                throw new UserException(400, "Requires LunchId");
+
+            ArrayList<LunchComment> lunchComments = lunchCommentRepository.findByLunchId(lunchId);
+            HashMap<String, ArrayList<String>> comments = new HashMap<>();
+
+            User user;
+            String name;
+            for(LunchComment lunchComment : lunchComments) {
+                user = userRepository.findByUserId(lunchComment.getUserId()).orElseThrow(
+                        () -> new UserException(400, "Unreachable Code - Just For Deleting Yellow Line")
+                );
+                name = user.getName();
+
+                if(!comments.containsKey(name))
+                    comments.put(name, new ArrayList<>());
+
+                comments.get(name).add(lunchComment.getComment());
+            }
+
+            return new CommentResponse(200, "Success getComments", comments);
+        } catch (UserException e) {
+            return new CommentResponse(e.getStatus(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new CommentResponse(500, e.getMessage());
         }
     }
 

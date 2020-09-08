@@ -1,21 +1,23 @@
 package dgsw.b1cami.cocode.Service;
 
 import dgsw.b1cami.cocode.Domain.Lunch;
-import dgsw.b1cami.cocode.json.LunchResponse;
-import dgsw.b1cami.cocode.json.LunchesResponse;
-import dgsw.b1cami.cocode.json.Response;
-import dgsw.b1cami.cocode.json.SchoolLunchResponse;
+import dgsw.b1cami.cocode.Domain.LunchComment;
+import dgsw.b1cami.cocode.json.*;
 
 public interface LunchService {
 
     Response uploadLunch(Lunch lunch, String key);
 
-    LunchResponse getLunch(Integer lunchId);
+    LunchResponse getLunch(Long lunchId);
 
-    LunchesResponse getLunches(Integer getCount);
+    LunchesResponse getLunches(Long getCount);
 
     SchoolLunchResponse getSchoolLunch();
 
-    Response deleteLunch(Integer lunchId);
+    Response deleteLunch(Long lunchId);
+
+    Response addComment(LunchComment lunchComment, String key);
+
+    CommentResponse getComments(Lunch lunch);
 
 }

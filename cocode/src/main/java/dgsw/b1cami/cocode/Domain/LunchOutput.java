@@ -2,7 +2,7 @@ package dgsw.b1cami.cocode.Domain;
 
 public class LunchOutput {
 
-    Integer id;
+    Long id;
 
     String uploader;
 
@@ -17,11 +17,11 @@ public class LunchOutput {
         this.setDescription(lunch.getDescription());
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

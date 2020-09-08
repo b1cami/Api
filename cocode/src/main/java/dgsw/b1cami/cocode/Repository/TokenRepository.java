@@ -13,13 +13,13 @@ import java.util.Optional;
 @Repository
 public interface TokenRepository extends JpaRepository<Token, Integer> {
 
-    Optional<Token> findByTokenOwnerId(Long tokenOwnerId);
+    Optional<Token> findByTokenOwnerId(Integer tokenOwnerId);
 
     Optional<Token> findByTokenKey(String tokenKey);
 
     @Transactional
     @Modifying
     @Query(value = "UPDATE token SET token_key = :key where token_owner_id = :ownerId", nativeQuery = true)
-    void changeToken(@Param("ownerId") Long ownerId, @Param("key") String key);
+    void changeToken(@Param("ownerId") Integer ownerId, @Param("key") String key);
 
 }
