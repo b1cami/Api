@@ -1,0 +1,14 @@
+package dgsw.b1cami.cocode.Repository;
+
+import dgsw.b1cami.cocode.Domain.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    Optional<User> findByUserEmail(String userEmail);
+
+    Optional<User> findByUserCertifyCode(String userCertifyCode);
+
+}
