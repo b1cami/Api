@@ -12,6 +12,4 @@ public interface UserService {
 
     Response signUp(User user);
 
-    User findUser(String email);
-
 }

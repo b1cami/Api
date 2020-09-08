@@ -29,15 +29,11 @@ public class User {
     @Column(nullable = true)
     String userImage;
 
-    @Column(nullable = false)
-    Boolean userIsCertified;
-
     @Column(nullable = true)
-    Integer userCertifyCode;
+    String userCertifyCode;
 
     public User(String email) {
         this.setEmail(email);
-        this.setIsCertified(false);
     }
 
     public Long getId() {
@@ -88,19 +84,12 @@ public class User {
         this.userImage = image;
     }
 
-    public Boolean getIsCertified() {
-        return userIsCertified;
-    }
-
-    public void setIsCertified(Boolean userIsCertified) {
-        this.userIsCertified = userIsCertified;
-    }
-
-    public Integer getCertifyCode() {
+    public String getCertifyCode() {
         return userCertifyCode;
     }
 
-    public void setCertifyCode(Integer certifyCode) {
+    public void setCertifyCode(String certifyCode) {
         this.userCertifyCode = certifyCode;
     }
+
 }

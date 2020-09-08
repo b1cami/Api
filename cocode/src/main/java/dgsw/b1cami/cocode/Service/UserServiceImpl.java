@@ -1,5 +1,6 @@
 package dgsw.b1cami.cocode.Service;
 
+import dgsw.b1cami.cocode.Domain.Token;
 import dgsw.b1cami.cocode.Domain.User;
 import dgsw.b1cami.cocode.Exception.UserException;
 import dgsw.b1cami.cocode.Repository.TokenRepository;
@@ -14,6 +15,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Properties;
 import java.util.Random;
@@ -74,8 +76,13 @@ public class UserServiceImpl implements UserService {
             if(!matcher.find())
                 throw new UserException(401, "Password Must Contain Number And English Character");
 
-            if (!findUser(email).getEmail().equals("Undefined"))
-                throw new UserException(400, "User Already Exists");
+            User findUser = userRepository.findByUserEmail(email).orElse(null);
+            if (findUser != null) {
+                if(findUser.getCertifyCode() == null)
+                    throw new UserException(400, "User Already Exists");
+
+                userRepository.delete(findUser);
+            }
 
             MimeMessage message = new MimeMessage(session);
 
@@ -86,7 +93,7 @@ public class UserServiceImpl implements UserService {
             String code;
 
             while(true) {
-                int random = (int) (Math.random() * 8999 + 1000);
+                int random = (int) (Math.random() * 899999 + 100000);
                 code = Integer.toString(random);
 
                 User objUser = userRepository.findByUserCertifyCode(code).orElse(null);
@@ -101,9 +108,10 @@ public class UserServiceImpl implements UserService {
             // Send
             Transport.send(message);
 
+            user.setCertifyCode(code);
             user.setPassword(convertSHA256(user.getPassword()));
-            userRepository.save(user);
 
+            userRepository.save(user);
             return new Response(200, "Success sendEmail");
         } catch (UserException e) {
             return new Response(e.getStatus(), e.getMessage());
@@ -115,26 +123,74 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponse login(User user) {
-        return null;
+        try {
+            String email = user.getEmail();
+            String password = user.getPassword();
+
+            if(email == null)
+                throw new UserException(400, "Requires Email");
+            if(password == null)
+                throw new UserException(400, "Requires Password");
+
+            User findUser = userRepository.findByUserEmail(user.getEmail()).orElseThrow(
+                    () -> new UserException(400, "User Already Exists")
+            );
+
+            user.setPassword(convertSHA256(user.getPassword()));
+            if(!findUser.getPassword().equals(user.getPassword()))
+                throw new UserException(401, "Password Different");
+
+            String key = makeToken();
+            String ip = findIp();
+            Token token = new Token(findUser.getId(), key, ip);
+
+            Token findToken = tokenRepository.findByTokenOwnerId(findUser.getId()).orElse(null);
+
+            if(findToken != null)
+                tokenRepository.changeToken(findUser.getId(), key);
+            else
+               tokenRepository.save(token);
+
+            return new LoginResponse(200, "Success Login", key, user);
+        } catch(UserException e) {
+            return new LoginResponse(e.getStatus(), e.getMessage());
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new LoginResponse(500, e.getMessage());
+        }
     }
 
     @Override
     public Response signUp(User user) {
-        return null;
-    }
+        try {
+            String email = user.getEmail();
+            String certifyCode = user.getCertifyCode();
 
-    @Override
-    public User findUser(String email) {
-        return userRepository.findByUserEmail(email).orElseGet(() -> new User("Undefined"));
+            if(email == null)
+                throw new UserException(400, "Requires Email");
+            if (certifyCode == null)
+                throw new UserException(400, "Requires CertifyCode");
+
+            User findUser = userRepository.findByUserCertifyCode(certifyCode).orElseThrow(
+                    () -> new UserException(401, "Undefined CertifyCode")
+            );
+
+            userRepository.certifyUser(findUser.getId());
+            return new Response(200, "Success SignUp");
+        } catch(UserException e) {
+            return new Response(e.getStatus(), e.getMessage());
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new Response(500, e.getMessage());
+        }
     }
 
     public String makeToken(){
         StringBuilder token = new StringBuilder();
         Random random = new Random();
 
-        for (int i = 0; i < 16; i++) {
-            token.append((char) ((int) (random.nextInt(26)) + 97));
-        }
+        for (int i = 0; i < 16; i++)
+            token.append((char) (random.nextInt(26) + 97));
 
         return token.toString();
     }
@@ -154,7 +210,7 @@ public class UserServiceImpl implements UserService {
     private String convertSHA256(String password) {
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(password.getBytes("UTF-8"));
+            byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
             StringBuilder hexString = new StringBuilder();
 
             for (byte b : hash) {
