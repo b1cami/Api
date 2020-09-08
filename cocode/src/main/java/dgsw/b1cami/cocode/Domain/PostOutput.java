@@ -4,7 +4,7 @@ public class PostOutput {
 
     Integer id;
 
-    Long uploader;
+    String uploader;
 
     String title;
 
@@ -25,11 +25,11 @@ public class PostOutput {
         this.id = id;
     }
 
-    public Long getUploader() {
+    public String getUploader() {
         return uploader;
     }
 
-    public void setUploader(Long uploader) {
+    public void setUploader(String uploader) {
         this.uploader = uploader;
     }
 

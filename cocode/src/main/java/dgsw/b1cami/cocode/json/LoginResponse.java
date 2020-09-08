@@ -2,9 +2,7 @@ package dgsw.b1cami.cocode.json;
 
 import dgsw.b1cami.cocode.Domain.User;
 import dgsw.b1cami.cocode.Domain.UserOutput;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 public class LoginResponse extends Response {
 
     String token;

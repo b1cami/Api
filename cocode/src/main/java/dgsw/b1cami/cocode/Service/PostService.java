@@ -7,7 +7,7 @@ import dgsw.b1cami.cocode.json.Response;
 
 public interface PostService {
 
-    Response uploadPost(Post post);
+    Response uploadPost(Post post, String key);
 
     PostResponse getPost(Integer postId);
 

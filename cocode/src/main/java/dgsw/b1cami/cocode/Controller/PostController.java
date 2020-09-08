@@ -24,9 +24,9 @@ public class PostController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<Response> uploadPost(@RequestBody Post post) {
+    public ResponseEntity<Response> uploadPost(@RequestBody Post post, @RequestHeader(name = "Token") String key) {
         System.out.println("post uploadPost - " + post.getTitle());
-        return new ResponseEntity<>(postService.uploadPost(post), HttpStatus.OK);
+        return new ResponseEntity<>(postService.uploadPost(post, key), HttpStatus.OK);
     }
 
     @GetMapping("/getPosts/{getCount}")

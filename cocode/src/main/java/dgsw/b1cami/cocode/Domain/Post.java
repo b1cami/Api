@@ -15,7 +15,7 @@ public class Post {
     Integer postId;
 
     @Column(nullable = false)
-    Long postUploader;
+    String postUploader;
 
     @Column(nullable = false, length = 100)
     String postTitle;
@@ -31,11 +31,11 @@ public class Post {
         this.postId = id;
     }
 
-    public Long getUploader() {
+    public String getUploader() {
         return postUploader;
     }
 
-    public void setUploader(Long uploader) {
+    public void setUploader(String uploader) {
         this.postUploader = uploader;
     }
 

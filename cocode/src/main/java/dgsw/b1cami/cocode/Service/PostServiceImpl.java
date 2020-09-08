@@ -2,8 +2,11 @@ package dgsw.b1cami.cocode.Service;
 
 import dgsw.b1cami.cocode.Domain.Post;
 import dgsw.b1cami.cocode.Domain.PostOutput;
+import dgsw.b1cami.cocode.Domain.Token;
+import dgsw.b1cami.cocode.Domain.User;
 import dgsw.b1cami.cocode.Exception.UserException;
 import dgsw.b1cami.cocode.Repository.PostRepository;
+import dgsw.b1cami.cocode.Repository.TokenRepository;
 import dgsw.b1cami.cocode.Repository.UserRepository;
 import dgsw.b1cami.cocode.json.PostResponse;
 import dgsw.b1cami.cocode.json.PostsResponse;
@@ -20,12 +23,26 @@ public class PostServiceImpl implements PostService {
     UserRepository userRepository;
 
     @Autowired
+    TokenRepository tokenRepository;
+
+    @Autowired
     PostRepository postRepository;
 
     @Override
-    public Response uploadPost(Post post) {
+    public Response uploadPost(Post post, String key) {
         try {
-            Long uploader = post.getUploader();
+            if(key == null)
+                throw new UserException(400, "Requires Key");
+
+            Token token = tokenRepository.findByTokenKey(key).orElseThrow(
+                    () -> new UserException(400, "Undefined Token Key")
+            );
+
+            User user = userRepository.findByUserId(token.getOwnerId()).orElse(
+                    new User("If This Goes Out, It'll Be Fucking Serious Error")
+            );
+
+            String uploader = user.getEmail();
             String title = post.getTitle();
             String content = post.getContent();
 
@@ -36,7 +53,7 @@ public class PostServiceImpl implements PostService {
             if(content == null)
                 throw new UserException(400, "Requires Content");
 
-            userRepository.findByUserId(uploader).orElseThrow(
+            userRepository.findByUserEmail(uploader).orElseThrow(
                     () -> new UserException(400, "Undefined Uploader")
             );
 
@@ -45,6 +62,7 @@ public class PostServiceImpl implements PostService {
             if(content.length() > 10000)
                 throw new UserException(400, "Content Must Be Shorter Than 10000");
 
+            post.setUploader(uploader);
             postRepository.save(post);
             return new Response(200, "Success Upload Post");
         } catch(UserException e) {
@@ -77,7 +95,7 @@ public class PostServiceImpl implements PostService {
             if(getCount < 0)
                 throw new UserException(400, "GetCount Must Ge Bigger Than 0");
 
-            Integer postCount = (int) postRepository.count();
+            int postCount = (int) postRepository.count();
 
             getCount = postCount - (getCount * 20);
             if(getCount <= 0)
