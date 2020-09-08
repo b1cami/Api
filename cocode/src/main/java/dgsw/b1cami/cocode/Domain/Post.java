@@ -2,8 +2,11 @@ package dgsw.b1cami.cocode.Domain;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -22,6 +25,14 @@ public class Post {
 
     @Column(nullable = false, length = 10000)
     String postContent;
+
+    @Column(nullable = false)
+    @CreationTimestamp
+    LocalDateTime postUploaded;
+
+    @Column(nullable = false)
+    @UpdateTimestamp
+    LocalDateTime postUpdated;
 
     public Long getId() {
         return postId;
@@ -54,4 +65,21 @@ public class Post {
     public void setContent(String content) {
         this.postContent = content;
     }
+
+    public LocalDateTime getPostUploaded() {
+        return postUploaded;
+    }
+
+    public void setPostUploaded(LocalDateTime postUploaded) {
+        this.postUploaded = postUploaded;
+    }
+
+    public LocalDateTime getPostUpdated() {
+        return postUpdated;
+    }
+
+    public void setPostUpdated(LocalDateTime postUpdated) {
+        this.postUpdated = postUpdated;
+    }
+    
 }

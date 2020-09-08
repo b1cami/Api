@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class LunchServiceImpl implements LunchService {
@@ -99,18 +100,36 @@ public class LunchServiceImpl implements LunchService {
             if(getCount < 0)
                 throw new UserException(400, "GetCount Must Ge Bigger Than 0");
 
-            Long minCount = lunchRepository.findAll().get(0).getId();
-            long postCount = lunchRepository.count() + minCount;
+            List<Lunch> found = lunchRepository.findAll();
+            if(found.size() == 0)
+                return new LunchesResponse(400, "Db Is Empty", new ArrayList<>());
 
-            getCount = postCount - (getCount * 20);
-            if(getCount <= minCount)
-                throw new UserException(400, "All Posts Already Returned");
-
-            ArrayList<Lunch> lunches = lunchRepository.findLunches(getCount);
             ArrayList<LunchOutput> lunchOutputs = new ArrayList<>();
+            Long lastIdx = found.get(found.size() - 1).getId();
+            long skipCount = 0L;
+            long requireSkip = getCount * 20;
+            long size = 0L;
 
-            for(Lunch lunch : lunches)
+            Lunch lunch;
+            for(Long i = lastIdx; i >= 1; i--) {
+                lunch = lunchRepository.findByLunchId(i).orElse(null);
+                if(lunch == null)
+                    continue;
+
+                if(skipCount < requireSkip) {
+                    skipCount++;
+                    continue;
+                }
+
                 lunchOutputs.add(new LunchOutput(lunch));
+                size++;
+
+                if(size == 20)
+                    break;
+            }
+
+            if(size == 0)
+                throw new UserException(400, "All Lunches Already Returned");
 
             return new LunchesResponse(200, "Success getPosts", lunchOutputs);
         } catch(UserException e) {
@@ -179,6 +198,10 @@ public class LunchServiceImpl implements LunchService {
                     () -> new UserException(400, "Undefined LunchId")
             );
 
+            ArrayList<LunchComment> lunchComments = lunchCommentRepository.findByLunchId(lunchId);
+            for(LunchComment lunchComment : lunchComments)
+                lunchCommentRepository.delete(lunchComment);
+
             lunchRepository.delete(lunch);
             return new Response(200, "Success deletePost");
         } catch(UserException e) {
@@ -238,7 +261,7 @@ public class LunchServiceImpl implements LunchService {
                 throw new UserException(400, "Requires LunchId");
 
             ArrayList<LunchComment> lunchComments = lunchCommentRepository.findByLunchId(lunchId);
-            HashMap<String, ArrayList<String>> comments = new HashMap<>();
+            HashMap<String, ArrayList<Object>> comments = new HashMap<>();
 
             User user;
             String name;
@@ -251,7 +274,7 @@ public class LunchServiceImpl implements LunchService {
                 if(!comments.containsKey(name))
                     comments.put(name, new ArrayList<>());
 
-                comments.get(name).add(lunchComment.getComment());
+                comments.get(name).add(lunchComment);
             }
 
             return new CommentResponse(200, "Success getComments", comments);
@@ -260,6 +283,23 @@ public class LunchServiceImpl implements LunchService {
         } catch (Exception e) {
             e.printStackTrace();
             return new CommentResponse(500, e.getMessage());
+        }
+    }
+
+    @Override
+    public Response deleteComment(Long commentId) {
+        try {
+            LunchComment lunchComment = lunchCommentRepository.findByLcId(commentId).orElseThrow(
+                    () -> new UserException(400, "Undefined CommentId")
+            );
+
+            lunchCommentRepository.delete(lunchComment);
+            return new Response(200, "Success deleteComment");
+        } catch (UserException e) {
+            return new Response(e.getStatus(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Response(500, e.getMessage());
         }
     }
 

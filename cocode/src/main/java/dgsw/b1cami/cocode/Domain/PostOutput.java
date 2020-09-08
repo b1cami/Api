@@ -1,5 +1,7 @@
 package dgsw.b1cami.cocode.Domain;
 
+import java.time.LocalDateTime;
+
 public class PostOutput {
 
     Long id;
@@ -10,11 +12,17 @@ public class PostOutput {
 
     String content;
 
+    LocalDateTime upload;
+
+    LocalDateTime update;
+
     public PostOutput(Post post) {
         this.setId(post.getId());
         this.setUploader(post.getUploader());
         this.setTitle(post.getTitle());
         this.setContent(post.getContent());
+        this.setUpload(post.getPostUploaded());
+        this.setUpdate(post.getPostUpdated());
     }
 
     public Long getId() {
@@ -48,4 +56,21 @@ public class PostOutput {
     public void setContent(String content) {
         this.content = content;
     }
+
+    public LocalDateTime getUpload() {
+        return upload;
+    }
+
+    public void setUpload(LocalDateTime upload) {
+        this.upload = upload;
+    }
+
+    public LocalDateTime getUpdate() {
+        return update;
+    }
+
+    public void setUpdate(LocalDateTime update) {
+        this.update = update;
+    }
+
 }

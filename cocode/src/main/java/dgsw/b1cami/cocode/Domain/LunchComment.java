@@ -2,8 +2,11 @@ package dgsw.b1cami.cocode.Domain;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -22,6 +25,14 @@ public class LunchComment {
 
     @Column(nullable = true, length = 100)
     String lcComment;
+
+    @Column(nullable = false)
+    @CreationTimestamp
+    LocalDateTime commentUploaded;
+
+    @Column(nullable = false)
+    @UpdateTimestamp
+    LocalDateTime commentUpdated;
 
     public Long getId() {
         return lcId;
@@ -53,6 +64,22 @@ public class LunchComment {
 
     public void setComment(String comment) {
         this.lcComment = comment;
+    }
+
+    public LocalDateTime getCommentUploaded() {
+        return commentUploaded;
+    }
+
+    public void setCommentUploaded(LocalDateTime commentUploaded) {
+        this.commentUploaded = commentUploaded;
+    }
+
+    public LocalDateTime getCommentUpdated() {
+        return commentUpdated;
+    }
+
+    public void setCommentUpdated(LocalDateTime commentUpdated) {
+        this.commentUpdated = commentUpdated;
     }
 
 }

@@ -13,6 +13,7 @@ import dgsw.b1cami.cocode.json.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -98,22 +99,40 @@ public class PostServiceImpl implements PostService {
             if(getCount < 0)
                 throw new UserException(400, "GetCount Must Ge Bigger Than 0");
 
-            Long minCount = postRepository.findAll().get(0).getId();
-            long postCount = postRepository.count() + minCount;
+            List<Post> found = postRepository.findAll();
+            if(found.size() == 0)
+                return new PostsResponse(400, "Db Is Empty", new ArrayList<>());
 
-            getCount = postCount - (getCount * 20);
-            if(getCount <= minCount)
-                throw new UserException(400, "All Posts Already Returned");
-
-            ArrayList<Post> posts = postRepository.findPosts(getCount);
             ArrayList<PostOutput> postOutputs = new ArrayList<>();
-
+            Long lastIdx = found.get(found.size() - 1).getId();
+            long skipCount = 0L;
+            long requireSkip = getCount * 20;
+            long size = 0L;
             int length;
-            for(Post post : posts) {
+
+            Post post;
+            for(Long i = lastIdx; i >= 1; i--) {
+                post = postRepository.findByPostId(i).orElse(null);
+                if(post == null) {
+                    continue;
+                }
+
+                if(skipCount < requireSkip) {
+                    skipCount++;
+                    continue;
+                }
+
                 length = Math.min(post.getContent().length(), 100);
                 post.setContent(post.getContent().substring(0, length));
                 postOutputs.add(new PostOutput(post));
+                size++;
+
+                if(size == 20)
+                    break;
             }
+
+            if(size == 0)
+                throw new UserException(400, "All Posts Already Returned");
 
             return new PostsResponse(200, "Success getPosts", postOutputs);
         } catch(UserException e) {
@@ -130,6 +149,10 @@ public class PostServiceImpl implements PostService {
             Post post = postRepository.findByPostId(postId).orElseThrow(
                     () -> new UserException(400, "Undefined PostId")
             );
+
+            ArrayList<PostComment> postComments = postCommentRepository.findByPostId(postId);
+            for(PostComment postComment : postComments)
+                postCommentRepository.delete(postComment);
 
             postRepository.delete(post);
             return new Response(200, "Success deletePost");
@@ -190,7 +213,7 @@ public class PostServiceImpl implements PostService {
                 throw new UserException(400, "Requires PostId");
 
             ArrayList<PostComment> postComments = postCommentRepository.findByPostId(postId);
-            HashMap<String, ArrayList<String>> comments = new HashMap<>();
+            HashMap<String, ArrayList<Object>> comments = new HashMap<>();
 
             User user;
             String name;
@@ -203,7 +226,7 @@ public class PostServiceImpl implements PostService {
                 if(!comments.containsKey(name))
                     comments.put(name, new ArrayList<>());
 
-                comments.get(name).add(postComment.getComment());
+                comments.get(name).add(postComment);
             }
 
             return new CommentResponse(200, "Success getComments", comments);
@@ -214,5 +237,23 @@ public class PostServiceImpl implements PostService {
             return new CommentResponse(500, e.getMessage());
         }
     }
+
+    @Override
+    public Response deleteComment(Long commentId) {
+        try {
+            PostComment postComment = postCommentRepository.findByPcId(commentId).orElseThrow(
+                    () -> new UserException(400, "Undefined CommentId")
+            );
+
+            postCommentRepository.delete(postComment);
+            return new Response(200, "Success deleteComment");
+        } catch (UserException e) {
+            return new Response(e.getStatus(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Response(500, e.getMessage());
+        }
+    }
+
 
 }

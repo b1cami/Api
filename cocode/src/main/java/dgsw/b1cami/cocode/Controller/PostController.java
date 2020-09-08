@@ -37,7 +37,7 @@ public class PostController {
         return new ResponseEntity<>(postService.getPosts(getCount), HttpStatus.OK);
     }
 
-    @PostMapping("/delete/{postId}")
+    @DeleteMapping("/delete/{postId}")
     public ResponseEntity<Response> deletePost(@PathVariable Long postId) {
         System.out.println("post deletePost - " + postId);
         return new ResponseEntity<>(postService.deletePost(postId), HttpStatus.OK);
@@ -53,6 +53,12 @@ public class PostController {
     public ResponseEntity<CommentResponse> getComments(@RequestBody Post post) {
         System.out.println("post getComments - " + post.getId());
         return new ResponseEntity<>(postService.getComments(post), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteComment/{commentId}")
+    public ResponseEntity<Response> deleteComment(@PathVariable Long commentId) {
+        System.out.println("post deleteComment - " + commentId);
+        return new ResponseEntity<>(postService.deleteComment(commentId), HttpStatus.OK);
     }
 
 }

@@ -20,4 +20,6 @@ public interface LunchService {
 
     CommentResponse getComments(Lunch lunch);
 
+    Response deleteComment(Long commentId);
+
 }

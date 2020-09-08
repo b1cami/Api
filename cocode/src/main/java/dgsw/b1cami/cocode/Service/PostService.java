@@ -21,4 +21,6 @@ public interface PostService {
 
     CommentResponse getComments(Post post);
 
+    Response deleteComment(Long commentId);
+
 }

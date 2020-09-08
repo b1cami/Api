@@ -30,7 +30,7 @@ public class lunchController {
     }
 
     @GetMapping("/getLunches/{getCount}")
-    public ResponseEntity<LunchesResponse> getPosts(@PathVariable Long getCount) {
+    public ResponseEntity<LunchesResponse> getLunches(@PathVariable Long getCount) {
         System.out.println("lunch getLunches - " + getCount);
         return new ResponseEntity<>(lunchService.getLunches(getCount), HttpStatus.OK);
     }
@@ -41,7 +41,7 @@ public class lunchController {
         return new ResponseEntity<>(lunchService.getSchoolLunch(), HttpStatus.OK);
     }
 
-    @PostMapping("/delete/{lunchId}")
+    @DeleteMapping("/delete/{lunchId}")
     public ResponseEntity<Response> deleteLunch(@PathVariable Long lunchId) {
         System.out.println("lunch deleteLunch - " + lunchId);
         return new ResponseEntity<>(lunchService.deleteLunch(lunchId), HttpStatus.OK);
@@ -57,6 +57,12 @@ public class lunchController {
     public ResponseEntity<CommentResponse> getComments(@RequestBody Lunch lunch) {
         System.out.println("lunch getComments - " + lunch.getId());
         return new ResponseEntity<>(lunchService.getComments(lunch), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteComment/{commentId}")
+    public ResponseEntity<Response> deleteComment(@PathVariable Long commentId) {
+        System.out.println("lunch deleteComment - " + commentId);
+        return new ResponseEntity<>(lunchService.deleteComment(commentId), HttpStatus.OK);
     }
 
 }
