@@ -22,8 +22,4 @@ public class PostsResponse extends Response {
         return posts;
     }
 
-    public void addPost(Post post) {
-        this.posts.add(new PostOutput(post));
-    }
-
 }

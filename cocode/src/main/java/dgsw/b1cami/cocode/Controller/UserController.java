@@ -1,9 +1,11 @@
 package dgsw.b1cami.cocode.Controller;
 
+import dgsw.b1cami.cocode.Domain.Token;
 import dgsw.b1cami.cocode.Domain.User;
 import dgsw.b1cami.cocode.Service.UserService;
 import dgsw.b1cami.cocode.json.LoginResponse;
 import dgsw.b1cami.cocode.json.Response;
+import dgsw.b1cami.cocode.json.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,12 @@ public class UserController {
     public ResponseEntity<LoginResponse> login(@RequestBody User user) {
         System.out.println("user login - " + user.getEmail() + ", " + user.getPassword());
         return new ResponseEntity<>(userService.login(user), HttpStatus.OK);
+    }
+
+    @GetMapping("/getUser")
+    public ResponseEntity<UserResponse> getUser(@RequestHeader(name = "Token") String key) {
+        System.out.println("user getUser - " + key);
+        return new ResponseEntity<>(userService.getUser(key), HttpStatus.OK);
     }
 
 }

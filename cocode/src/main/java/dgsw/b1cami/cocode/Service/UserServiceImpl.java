@@ -7,6 +7,7 @@ import dgsw.b1cami.cocode.Repository.TokenRepository;
 import dgsw.b1cami.cocode.Repository.UserRepository;
 import dgsw.b1cami.cocode.json.LoginResponse;
 import dgsw.b1cami.cocode.json.Response;
+import dgsw.b1cami.cocode.json.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -190,6 +191,23 @@ public class UserServiceImpl implements UserService {
         } catch(Exception e) {
             e.printStackTrace();
             return new Response(500, e.getMessage());
+        }
+    }
+
+    @Override
+    public UserResponse getUser(String key) {
+        try {
+            if (key == null)
+                throw new UserException(400, "Requires Token Key");
+
+            Token token = tokenRepository.findByTokenKey(key).orElseThrow(
+                    () -> new UserException(400, "Undefined Token Key")
+            );
+
+            User user = userRepository.findByUserId(token.getOwnerId()).orElse(null);
+            return new UserResponse(200, "Success GetUser", user);
+        } catch(UserException e) {
+            return new UserResponse(e.getStatus(), e.getMessage());
         }
     }
 
