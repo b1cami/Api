@@ -76,6 +76,11 @@ public class UserServiceImpl implements UserService {
             if(!matcher.find())
                 throw new UserException(401, "Password Must Contain Number And English Character");
 
+            pattern = Pattern.compile("^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$");
+            matcher = pattern.matcher(email);
+            if(!matcher.find())
+                throw new UserException(401, "Email Is Not Valid");
+
             User findUser = userRepository.findByUserEmail(email).orElse(null);
             if (findUser != null) {
                 if(findUser.getCertifyCode() == null)
@@ -133,8 +138,11 @@ public class UserServiceImpl implements UserService {
                 throw new UserException(400, "Requires Password");
 
             User findUser = userRepository.findByUserEmail(user.getEmail()).orElseThrow(
-                    () -> new UserException(400, "User Already Exists")
+                    () -> new UserException(400, "User Doesn't Exists")
             );
+
+            if(findUser.getCertifyCode() != null)
+                throw new UserException(401, "Email Hasn't Certified");
 
             user.setPassword(convertSHA256(user.getPassword()));
             if(!findUser.getPassword().equals(user.getPassword()))

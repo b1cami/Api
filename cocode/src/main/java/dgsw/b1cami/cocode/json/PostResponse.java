@@ -16,4 +16,8 @@ public class PostResponse extends Response {
         this.post = new PostOutput(post);
     }
 
+    public PostOutput getPost() {
+        return post;
+    }
+
 }

@@ -17,10 +17,10 @@ public class Post {
     @Column(nullable = false)
     Long postUploader;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     String postTitle;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10000)
     String postContent;
 
     public Integer getId() {

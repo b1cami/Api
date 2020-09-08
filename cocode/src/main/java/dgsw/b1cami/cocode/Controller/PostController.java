@@ -1,5 +1,6 @@
 package dgsw.b1cami.cocode.Controller;
 
+import dgsw.b1cami.cocode.Domain.Post;
 import dgsw.b1cami.cocode.Service.PostService;
 import dgsw.b1cami.cocode.json.PostResponse;
 import dgsw.b1cami.cocode.json.Response;
@@ -22,6 +23,9 @@ public class PostController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<Response> uploadPost(@RequestBody )
+    public ResponseEntity<Response> uploadPost(@RequestBody Post post) {
+        System.out.println("post uploadPost - " + post.getTitle());
+        return new ResponseEntity<>(postService.uploadPost(post), HttpStatus.OK);
+    }
 
 }
