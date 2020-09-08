@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+
 @RestController
 @RequestMapping("/post")
 public class PostController {
@@ -33,6 +35,12 @@ public class PostController {
     public ResponseEntity<PostsResponse> getPosts(@PathVariable Integer getCount) {
         System.out.println("post getPosts - " + getCount);
         return new ResponseEntity<>(postService.getPosts(getCount), HttpStatus.OK);
+    }
+
+    @PostMapping("/delete/{postId}")
+    public ResponseEntity<Response> deletePost(@PathVariable Integer postId) {
+        System.out.println("post deletePost - " + postId);
+        return new ResponseEntity<>(postService.deletePost(postId), HttpStatus.OK);
     }
 
 }

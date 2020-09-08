@@ -77,7 +77,7 @@ public class PostServiceImpl implements PostService {
     public PostResponse getPost(Integer postId) {
         try {
             Post post = postRepository.findByPostId(postId).orElseThrow(
-                    () -> new UserException(400, "Undefined Post")
+                    () -> new UserException(400, "Undefined PostId")
             );
 
             return new PostResponse(200, "Success GetPost", post);
@@ -95,17 +95,20 @@ public class PostServiceImpl implements PostService {
             if(getCount < 0)
                 throw new UserException(400, "GetCount Must Ge Bigger Than 0");
 
-            int postCount = (int) postRepository.count();
+            int minCount = postRepository.findAll().get(0).getId();
+            int postCount = (int) postRepository.count() + minCount;
 
             getCount = postCount - (getCount * 20);
-            if(getCount <= 0)
+            if(getCount <= minCount)
                 throw new UserException(400, "All Posts Already Returned");
 
             ArrayList<Post> posts = postRepository.findPosts(getCount);
             ArrayList<PostOutput> postOutputs = new ArrayList<>();
 
+            int length;
             for(Post post : posts) {
-                post.setContent(null);
+                length = Math.min(post.getContent().length(), 100);
+                post.setContent(post.getContent().substring(0, length));
                 postOutputs.add(new PostOutput(post));
             }
 
@@ -115,6 +118,23 @@ public class PostServiceImpl implements PostService {
         } catch(Exception e) {
             e.printStackTrace();
             return new PostsResponse(500, e.getMessage());
+        }
+    }
+
+    @Override
+    public Response deletePost(Integer postId) {
+        try {
+            Post post = postRepository.findByPostId(postId).orElseThrow(
+                    () -> new UserException(400, "Undefined PostId")
+            );
+
+            postRepository.delete(post);
+            return new Response(200, "Success deletePost");
+        } catch(UserException e) {
+            return new Response(e.getStatus(), e.getMessage());
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new Response(500, e.getMessage());
         }
     }
 

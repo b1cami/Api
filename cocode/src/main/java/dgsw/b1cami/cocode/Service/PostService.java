@@ -13,4 +13,6 @@ public interface PostService {
 
     PostsResponse getPosts(Integer getCount);
 
+    Response deletePost(Integer postId);
+
 }

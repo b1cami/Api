@@ -18,7 +18,7 @@ public interface LunchRepository extends JpaRepository<Lunch, Integer> {
 
     @Transactional
     @Modifying
-    @Query(value = "SELECT * FROM lunch WHERE lunch_id > (:lunchCount - 20) AND lunch_id <= :lunchCount ORDER BY lunch_id DESC", nativeQuery = true)
+    @Query(value = "SELECT * FROM lunch WHERE lunch_id >= (:lunchCount - 20) AND lunch_id < :lunchCount ORDER BY lunch_id DESC", nativeQuery = true)
     ArrayList<Lunch> findLunches(@Param("lunchCount") Integer lunchCount);
 
 }

@@ -6,10 +6,14 @@ import dgsw.b1cami.cocode.Repository.LunchRepository;
 import dgsw.b1cami.cocode.Repository.TokenRepository;
 import dgsw.b1cami.cocode.Repository.UserRepository;
 import dgsw.b1cami.cocode.json.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 @Service
 public class LunchServiceImpl implements LunchService {
@@ -90,24 +94,92 @@ public class LunchServiceImpl implements LunchService {
             if(getCount < 0)
                 throw new UserException(400, "GetCount Must Ge Bigger Than 0");
 
-            int lunchCount = (int) lunchRepository.count();
+            int minCount = lunchRepository.findAll().get(0).getId();
+            int postCount = (int) lunchRepository.count() + minCount;
 
-            getCount = lunchCount - (getCount * 20);
-            if(getCount <= 0)
-                throw new UserException(400, "All Lunches Already Returned");
+            getCount = postCount - (getCount * 20);
+            if(getCount <= minCount)
+                throw new UserException(400, "All Posts Already Returned");
 
-            ArrayList<Lunch> posts = lunchRepository.findLunches(getCount);
-            ArrayList<LunchOutput> lunchesOutput = new ArrayList<>();
+            ArrayList<Lunch> lunches = lunchRepository.findLunches(getCount);
+            ArrayList<LunchOutput> lunchOutputs = new ArrayList<>();
 
-            for(Lunch lunch : posts)
-                lunchesOutput.add(new LunchOutput(lunch));
+            for(Lunch lunch : lunches)
+                lunchOutputs.add(new LunchOutput(lunch));
 
-            return new LunchesResponse(200, "Success getPosts", lunchesOutput);
+            return new LunchesResponse(200, "Success getPosts", lunchOutputs);
         } catch(UserException e) {
             return new LunchesResponse(e.getStatus(), e.getMessage());
         } catch(Exception e) {
             e.printStackTrace();
             return new LunchesResponse(500, e.getMessage());
+        }
+    }
+
+    @Override
+    public SchoolLunchResponse getSchoolLunch() {
+        try {
+            Calendar calendar = Calendar.getInstance();
+
+            StringBuilder url = new StringBuilder(
+                    "https://stu.dge.go.kr/sts_sci_md00_001.do?schulCode=D100000282&schulCrseScCode=4&schulKndScCode=04&schYm="
+            );
+            url.append(calendar.get(Calendar.YEAR));
+            url.append(String.format("%02d", calendar.get(Calendar.MONTH) + 1));
+            url.append("&");
+
+            Document doc = Jsoup.connect(url.toString()).get();
+            Element ele = doc.select("tbody").select("td").get(calendar.get(Calendar.DATE) + 1).selectFirst("div");
+            String[] split = ele.text().split(" ");
+
+            ArrayList<ArrayList<String>> menu = new ArrayList<>();
+
+            for(int i = 0; i < 3; i++)
+                menu.add(new ArrayList<>());
+            int index = 0;
+
+            for(String s : split) {
+                s = s.replaceAll("[0-9.]", "");
+
+                if(s.equals(""))
+                    continue;
+
+                switch (s) {
+                    case "[조식]":
+                        index = 0;
+                        continue;
+                    case "[중식]":
+                        index = 1;
+                        continue;
+                    case "[석식]":
+                        index = 2;
+                        continue;
+                }
+
+                menu.get(index).add(s);
+            }
+
+            return new SchoolLunchResponse(200, "Success GetSchoolLunch", menu);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new SchoolLunchResponse(500, e.getMessage());
+        }
+    }
+
+    @Override
+    public Response deleteLunch(Integer lunchId) {
+        try {
+            Lunch lunch = lunchRepository.findByLunchId(lunchId).orElseThrow(
+                    () -> new UserException(400, "Undefined LunchId")
+            );
+
+            lunchRepository.delete(lunch);
+            return new Response(200, "Success deletePost");
+        } catch(UserException e) {
+            return new Response(e.getStatus(), e.getMessage());
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new Response(500, e.getMessage());
         }
     }
 

@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
             else
                tokenRepository.save(token);
 
-            return new LoginResponse(200, "Success Login", key, user);
+            return new LoginResponse(200, "Success Login", key, findUser);
         } catch(UserException e) {
             return new LoginResponse(e.getStatus(), e.getMessage());
         } catch(Exception e) {

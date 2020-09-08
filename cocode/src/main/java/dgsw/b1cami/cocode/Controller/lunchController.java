@@ -1,9 +1,7 @@
 package dgsw.b1cami.cocode.Controller;
 
 import dgsw.b1cami.cocode.Domain.Lunch;
-import dgsw.b1cami.cocode.Domain.Post;
 import dgsw.b1cami.cocode.Service.LunchService;
-import dgsw.b1cami.cocode.Service.PostService;
 import dgsw.b1cami.cocode.json.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +31,18 @@ public class lunchController {
     public ResponseEntity<LunchesResponse> getPosts(@PathVariable Integer getCount) {
         System.out.println("lunch getLunches - " + getCount);
         return new ResponseEntity<>(lunchService.getLunches(getCount), HttpStatus.OK);
+    }
+
+    @GetMapping("/getSchoolLunch")
+    public ResponseEntity<SchoolLunchResponse> getSchoolLunch() {
+        System.out.println("lunch getSchoolLunch");
+        return new ResponseEntity<>(lunchService.getSchoolLunch(), HttpStatus.OK);
+    }
+
+    @PostMapping("/delete/{lunchId}")
+    public ResponseEntity<Response> deleteLunch(@PathVariable Integer lunchId) {
+        System.out.println("lunch deleteLunch - " + lunchId);
+        return new ResponseEntity<>(lunchService.deleteLunch(lunchId), HttpStatus.OK);
     }
 
 }
