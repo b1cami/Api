@@ -19,6 +19,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUserCertifyCode(String userCertifyCode);
 
+    Optional<User> findByUserName(String userName);
+
     @Transactional
     @Modifying
     @Query(value = "UPDATE user SET user_certify_code = null where user_id = :userId", nativeQuery = true)

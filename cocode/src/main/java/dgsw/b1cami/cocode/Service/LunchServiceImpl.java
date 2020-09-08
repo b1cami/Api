@@ -37,7 +37,7 @@ public class LunchServiceImpl implements LunchService {
                     new User("If This Goes Out, It'll Be Fucking Serious Error")
             );
 
-            String uploader = user.getEmail();
+            String uploader = user.getName();
             String foodName = lunch.getFoodName();
             String description = lunch.getDescription();
 
@@ -48,7 +48,7 @@ public class LunchServiceImpl implements LunchService {
             if(description == null)
                 throw new UserException(400, "Requires Description");
 
-            userRepository.findByUserEmail(uploader).orElseThrow(
+            userRepository.findByUserName(uploader).orElseThrow(
                     () -> new UserException(400, "Undefined Uploader")
             );
 

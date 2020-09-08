@@ -42,7 +42,7 @@ public class PostServiceImpl implements PostService {
                     new User("If This Goes Out, It'll Be Fucking Serious Error")
             );
 
-            String uploader = user.getEmail();
+            String uploader = user.getName();
             String title = post.getTitle();
             String content = post.getContent();
 
@@ -53,7 +53,7 @@ public class PostServiceImpl implements PostService {
             if(content == null)
                 throw new UserException(400, "Requires Content");
 
-            userRepository.findByUserEmail(uploader).orElseThrow(
+            userRepository.findByUserName(uploader).orElseThrow(
                     () -> new UserException(400, "Undefined Uploader")
             );
 
