@@ -17,10 +17,10 @@ public class Lunch {
     @Column(nullable = false)
     String lunchUploader;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     String lunchFoodName;
 
-    @Column(nullable = true)
+    @Column(nullable = true, length = 100)
     String lunchDescription;
 
     public Integer getId() {
