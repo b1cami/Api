@@ -18,7 +18,7 @@ public interface LunchService {
 
     Response addComment(LunchComment lunchComment, String key);
 
-    CommentResponse getComments(Lunch lunch);
+    CommentResponse getComments(Long lunchId);
 
     Response deleteComment(Long commentId);
 

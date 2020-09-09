@@ -49,10 +49,10 @@ public class PostController {
         return new ResponseEntity<>(postService.addComment(postComment, key), HttpStatus.OK);
     }
 
-    @GetMapping("/getComments")
-    public ResponseEntity<CommentResponse> getComments(@RequestBody Post post) {
-        System.out.println("post getComments - " + post.getId());
-        return new ResponseEntity<>(postService.getComments(post), HttpStatus.OK);
+    @GetMapping("/getComments/{postId}")
+    public ResponseEntity<CommentResponse> getComments(@PathVariable Long postId) {
+        System.out.println("post getComments - " + postId);
+        return new ResponseEntity<>(postService.getComments(postId), HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteComment/{commentId}")

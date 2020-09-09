@@ -253,13 +253,8 @@ public class LunchServiceImpl implements LunchService {
     }
 
     @Override
-    public CommentResponse getComments(Lunch lunch) {
+    public CommentResponse getComments(Long lunchId) {
         try {
-            Long lunchId = lunch.getId();
-
-            if (lunchId == null)
-                throw new UserException(400, "Requires LunchId");
-
             ArrayList<LunchComment> lunchComments = lunchCommentRepository.findByLunchId(lunchId);
             HashMap<String, ArrayList<Object>> comments = new HashMap<>();
 

@@ -19,7 +19,7 @@ public interface PostService {
 
     Response addComment(PostComment postComment, String key);
 
-    CommentResponse getComments(Post post);
+    CommentResponse getComments(Long postId);
 
     Response deleteComment(Long commentId);
 

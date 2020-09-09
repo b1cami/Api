@@ -53,10 +53,10 @@ public class lunchController {
         return new ResponseEntity<>(lunchService.addComment(lunchComment, key), HttpStatus.OK);
     }
 
-    @GetMapping("/getComments")
-    public ResponseEntity<CommentResponse> getComments(@RequestBody Lunch lunch) {
-        System.out.println("lunch getComments - " + lunch.getId());
-        return new ResponseEntity<>(lunchService.getComments(lunch), HttpStatus.OK);
+    @GetMapping("/getComments/{lunchId}")
+    public ResponseEntity<CommentResponse> getComments(@PathVariable Long lunchId) {
+        System.out.println("lunch getComments - " + lunchId);
+        return new ResponseEntity<>(lunchService.getComments(lunchId), HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteComment/{commentId}")

@@ -205,13 +205,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public CommentResponse getComments(Post post) {
+    public CommentResponse getComments(Long postId) {
         try {
-            Long postId = post.getId();
-
-            if (postId == null)
-                throw new UserException(400, "Requires PostId");
-
             ArrayList<PostComment> postComments = postCommentRepository.findByPostId(postId);
             HashMap<String, ArrayList<Object>> comments = new HashMap<>();
 
