@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 public class CommentOutput {
 
+    Long id;
+
     String userName;
 
     String comment;
@@ -13,6 +15,7 @@ public class CommentOutput {
     LocalDateTime update;
 
     public CommentOutput(String userName, LunchComment comment) {
+        this.id = comment.getId();
         this.userName = userName;
         this.comment = comment.getComment();
         this.upload = comment.getCommentUploaded();
@@ -20,10 +23,15 @@ public class CommentOutput {
     }
 
     public CommentOutput(String userName, PostComment comment) {
+        this.id = comment.getId();
         this.userName = userName;
         this.comment = comment.getComment();
         this.upload = comment.getCommentUploaded();
         this.update = comment.getCommentUpdated();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getUserName() {
